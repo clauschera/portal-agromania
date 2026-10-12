@@ -246,10 +246,17 @@
         'Accept-Profile': 'portal'
       }
     }).then(function(r){
-      if (r.status === 401 || r.status === 403) return { expirou: true };
-      return r.json().then(function(j){
-        if (!r.ok) throw new Error(j && j.message ? j.message : ('Supabase respondeu ' + r.status));
-        return { lista: j };
+      return r.text().then(function(txt){
+        if (r.ok) return { lista: JSON.parse(txt) };
+        var j = {};
+        try { j = JSON.parse(txt); } catch (e) {}
+        var recado = j.message || j.msg || txt.slice(0, 200) || ('Supabase respondeu ' + r.status);
+        // O PostgREST usa 401 tanto para token vencido quanto para permissão
+        // negada. Só o texto separa os dois — e tratar permissão negada como
+        // token velho faz a página renovar em silêncio e voltar para o login
+        // sem explicar nada. Foi assim que o portal "não entrava".
+        var pareceToken = r.status === 401 && /jwt|token|expired|exp claim/i.test(recado);
+        return { falhou: true, status: r.status, recado: recado, pareceToken: pareceToken };
       });
     });
   }
@@ -287,10 +294,16 @@
     document.getElementById('blocos').innerHTML = html;
   }
 
-  function abrir(sessao){
+  // jaRenovou: trava de uma volta só. Sem ela, 401 por permissão vira um
+  // vai-e-vem infinito entre renovar e tentar de novo.
+  function abrir(sessao, jaRenovou){
     ver('carregando');
     buscarApps(sessao.access_token).then(function(r){
-      if (r.expirou) return renovar(sessao);
+      if (r.falhou){
+        if (r.pareceToken && !jaRenovou) return renovar(sessao);
+        return erro('Entrei como ' + (sessao.email || 'você') + ', mas não consegui ler a lista. '
+                  + 'O Supabase respondeu ' + r.status + ': ' + r.recado);
+      }
       document.getElementById('usuario').textContent = sessao.email || '';
       desenhar(r.lista);
       ver('portal');
@@ -300,17 +313,28 @@
   }
 
   function renovar(sessao){
-    if (!sessao || !sessao.refresh_token){ esquecer(); ver('entrada'); return; }
+    if (!sessao || !sessao.refresh_token){
+      esquecer();
+      erro('Sua sessão expirou. Entre de novo.');
+      return;
+    }
     pedirToken({ refresh_token: sessao.refresh_token }, 'refresh_token').then(function(r){
-      if (!r.ok || !r.corpo.access_token){ esquecer(); ver('entrada'); return; }
+      if (!r.ok || !r.corpo.access_token){
+        esquecer();
+        erro('Sua sessão expirou. Entre de novo.');
+        return;
+      }
       var nova = {
         access_token: r.corpo.access_token,
         refresh_token: r.corpo.refresh_token,
         email: (r.corpo.user && r.corpo.user.email) || sessao.email
       };
       guardar(nova);
-      abrir(nova);
-    }).catch(function(){ esquecer(); ver('entrada'); });
+      abrir(nova, true);
+    }).catch(function(){
+      esquecer();
+      erro('Sua sessão expirou. Entre de novo.');
+    });
   }
 
   // ------------------------------------------------------------ eventos ---
