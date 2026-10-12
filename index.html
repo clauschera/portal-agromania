@@ -27,6 +27,10 @@
     --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
+  /* Sem isto, o display:grid de .meio vence o atributo hidden e a tela de
+     entrada continua ocupando a altura toda depois do login — o portal é
+     desenhado embaixo dela, fora da vista, e parece que nada aconteceu. */
+  [hidden]{display:none !important}
   html,body{margin:0;padding:0}
   body{
     background:var(--bg); color:var(--texto);
@@ -138,7 +142,7 @@
     <button class="principal" id="btEntrar" type="submit">Entrar</button>
     <div id="erro" class="erro" hidden></div>
     <p class="nota">É o login do Supabase do projeto Tratativas — o mesmo das tratativas, das gramas e do controle de validade.
-      <br><span style="opacity:.65">versão 3</span></p>
+      <br><span style="opacity:.65">versão 4</span></p>
   </form>
 </div>
 
