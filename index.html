@@ -137,7 +137,8 @@
 
     <button class="principal" id="btEntrar" type="submit">Entrar</button>
     <div id="erro" class="erro" hidden></div>
-    <p class="nota">É o login do Supabase do projeto Tratativas — o mesmo das tratativas, das gramas e do controle de validade.</p>
+    <p class="nota">É o login do Supabase do projeto Tratativas — o mesmo das tratativas, das gramas e do controle de validade.
+      <br><span style="opacity:.65">versão 3</span></p>
   </form>
 </div>
 
@@ -338,8 +339,15 @@
   }
 
   // ------------------------------------------------------------ eventos ---
-  formLogin.addEventListener('submit', function(ev){
-    ev.preventDefault();
+  // Escuta o SUBMIT do formulário e também o CLIQUE do botão. Gerenciador de
+  // senha, extensão e teclado virtual às vezes engolem um dos dois — e quando
+  // isso acontece a tela não reage a nada, que é o pior defeito possível.
+  var tentando = false;
+
+  function tentarEntrar(ev){
+    if (ev && ev.preventDefault) ev.preventDefault();
+    if (tentando) return;
+    tentando = true;
     caixaErro.hidden = true;
     btEntrar.disabled = true;
     btEntrar.textContent = 'Entrando…';
@@ -348,6 +356,7 @@
       email: document.getElementById('email').value.trim(),
       password: document.getElementById('senha').value
     }, 'password').then(function(r){
+      tentando = false;
       btEntrar.disabled = false;
       btEntrar.textContent = 'Entrar';
       if (!r.ok || !r.corpo.access_token){
@@ -364,10 +373,17 @@
       guardar(sessao);
       abrir(sessao);
     }).catch(function(e){
+      tentando = false;
       btEntrar.disabled = false;
       btEntrar.textContent = 'Entrar';
       erro('Não consegui falar com o Supabase: ' + (e && e.message ? e.message : e));
     });
+  }
+
+  formLogin.addEventListener('submit', tentarEntrar);
+  btEntrar.addEventListener('click', tentarEntrar);
+  document.getElementById('senha').addEventListener('keydown', function(ev){
+    if (ev.key === 'Enter') tentarEntrar(ev);
   });
 
   document.getElementById('btSair').addEventListener('click', function(){
