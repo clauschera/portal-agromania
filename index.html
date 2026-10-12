@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal Agromania</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{
+    --bg:#f6f7f4; --card:#ffffff; --linha:#e3e6df; --texto:#1c2119;
+    --suave:#60695a; --verde:#2f6b3f; --aviso:#8a5a12;
+    --btn-bg:#24542f; --btn-texto:#ffffff; --erro-texto:#b43c28;
+    --sombra:0 1px 2px rgba(28,33,25,.05), 0 8px 24px rgba(28,33,25,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14160f; --card:#1c1f18; --linha:#2b2f26; --texto:#eceee8;
+      --suave:#9aa394; --verde:#79b98c; --aviso:#d9ad62;
+      --btn-bg:#9ad0a9; --btn-texto:#14160f; --erro-texto:#f0a394;
+      --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14160f; --card:#1c1f18; --linha:#2b2f26; --texto:#eceee8;
+    --suave:#9aa394; --verde:#79b98c; --aviso:#d9ad62;
+    --btn-bg:#9ad0a9; --btn-texto:#14160f; --erro-texto:#f0a394;
+    --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--texto);
+    font:16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .quadro{max-width:1040px; margin:0 auto; padding:32px 16px 72px}
+
+  /* --------------------------------------------------------- abertura --- */
+  .meio{min-height:100vh; display:grid; place-items:center; padding:24px 16px}
+  .caixa{
+    width:100%; max-width:380px; background:var(--card); border:1px solid var(--linha);
+    border-radius:14px; padding:28px; box-shadow:var(--sombra);
+  }
+  .marca{font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--verde); font-weight:700}
+  .caixa h1{font-size:22px; margin:10px 0 4px; letter-spacing:-.01em}
+  .caixa p.sub{margin:0 0 22px; color:var(--suave); font-size:14px}
+  label{display:block; font-size:13px; font-weight:600; margin:14px 0 6px; color:var(--suave)}
+  input{
+    width:100%; padding:11px 12px; font-size:15px; color:var(--texto);
+    background:var(--bg); border:1px solid var(--linha); border-radius:9px;
+  }
+  input:focus{outline:2px solid var(--verde); outline-offset:1px; border-color:transparent}
+  button.principal{
+    width:100%; margin-top:20px; padding:12px; font-size:15px; font-weight:650;
+    color:var(--btn-texto); background:var(--btn-bg); border:0; border-radius:9px; cursor:pointer;
+  }
+  button.principal:hover{filter:brightness(1.08)}
+  button.principal:disabled{opacity:.6; cursor:default}
+  .erro{
+    margin-top:16px; padding:10px 12px; border-radius:9px; font-size:13.5px;
+    background:rgba(180,60,40,.1); color:var(--erro-texto); border:1px solid rgba(180,60,40,.25);
+  }
+  .nota{margin-top:18px; font-size:12.5px; color:var(--suave); line-height:1.45}
+
+  /* ------------------------------------------------------------- topo --- */
+  header.topo{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  header.topo h1{font-size:26px; margin:0; letter-spacing:-.02em}
+  .quem{margin-left:auto; display:flex; align-items:center; gap:12px; font-size:13px; color:var(--suave)}
+  button.sair{
+    background:none; border:1px solid var(--linha); color:var(--suave);
+    padding:6px 12px; border-radius:8px; font-size:13px; cursor:pointer;
+  }
+  button.sair:hover{color:var(--texto); border-color:var(--suave)}
+  p.chamada{margin:6px 0 34px; color:var(--suave); font-size:14.5px; max-width:62ch}
+
+  /* ----------------------------------------------------------- blocos --- */
+  section{margin-bottom:38px}
+  h2{
+    font-size:12.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--verde);
+    margin:0 0 4px; font-weight:700;
+  }
+  .legenda{margin:0 0 16px; font-size:13.5px; color:var(--suave)}
+  .grade{display:grid; gap:12px; grid-template-columns:repeat(auto-fill, minmax(258px,1fr))}
+  a.cartao{
+    display:block; text-decoration:none; color:inherit; background:var(--card);
+    border:1px solid var(--linha); border-radius:12px; padding:16px 16px 15px;
+    box-shadow:var(--sombra); transition:transform .12s ease, border-color .12s ease;
+  }
+  a.cartao:hover{transform:translateY(-2px); border-color:var(--verde)}
+  a.cartao .nome{font-weight:650; font-size:15.5px; letter-spacing:-.01em}
+  a.cartao .desc{margin-top:5px; font-size:13.5px; color:var(--suave); line-height:1.45}
+  .selo{
+    display:inline-block; margin-top:11px; margin-right:6px; font-size:11px; font-weight:650;
+    letter-spacing:.05em; text-transform:uppercase; padding:3px 8px; border-radius:999px;
+    border:1px solid var(--aviso); color:var(--aviso);
+  }
+  .selo.alerta{border-color:var(--erro-texto); color:var(--erro-texto)}
+  footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--linha); font-size:12.5px; color:var(--suave); line-height:1.6}
+  footer code{font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- =========================================================================
+     PORTAL AGROMANIA  ·  12/10/2026
+
+     COMO FUNCIONA
+       A lista de sistemas NÃO está neste arquivo: ela vive na tabela
+       portal.app do Supabase, protegida por RLS. Quem abrir o código-fonte sem
+       estar logado não vê endereço nenhum — só o formulário de entrada. Para
+       acrescentar um cartão, você insere uma linha na tabela pela tela do
+       Supabase; a página não precisa ser mexida nem republicada.
+
+     NÃO PRECISA EDITAR NADA
+       A chave já está colada: é a PUBLICÁVEL (sb_publishable_...) do projeto
+       Tratativas, a mesma que já está no HTML do app de tratativas e do
+       atendimento. Ela é pública por desenho — sozinha não abre nada, porque a
+       RLS decide tudo. A chave SECRETA (service_role) não está aqui e nunca vai
+       estar, nem em comentário.
+
+     ANTES DE PUBLICAR
+       Rodar portal_01_inicial.sql e acrescentar  portal  em
+       Settings > API > Exposed schemas.
+     ========================================================================= -->
+
+<div class="meio" id="telaEntrada">
+  <form class="caixa" id="formLogin" autocomplete="on">
+    <div class="marca">Agromania</div>
+    <h1>Portal</h1>
+    <p class="sub">Entre com o mesmo e-mail e senha dos outros sistemas.</p>
+
+    <label for="email">E-mail</label>
+    <input id="email" name="email" type="email" autocomplete="username" required>
+
+    <label for="senha">Senha</label>
+    <input id="senha" name="password" type="password" autocomplete="current-password" required>
+
+    <button class="principal" id="btEntrar" type="submit">Entrar</button>
+    <div id="erro" class="erro" hidden></div>
+    <p class="nota">É o login do Supabase do projeto Tratativas — o mesmo das tratativas, das gramas e do controle de validade.</p>
+  </form>
+</div>
+
+<div class="meio" id="telaCarregando" hidden>
+  <div class="caixa" style="text-align:center">
+    <div class="marca">Agromania</div>
+    <p class="sub" style="margin:14px 0 0">Abrindo o portal…</p>
+  </div>
+</div>
+
+<div class="quadro" id="telaPortal" hidden>
+  <header class="topo">
+    <h1>Portal Agromania</h1>
+    <div class="quem">
+      <span id="usuario"></span>
+      <button class="sair" id="btSair" type="button">Sair</button>
+    </div>
+  </header>
+  <p class="chamada">Tudo que está no ar, num lugar só. O que pede uma senha diferente desta está marcado.</p>
+  <div id="blocos"></div>
+  <footer>
+    <strong>Para acrescentar um cartão:</strong> Supabase &rarr; Table editor &rarr; schema <code>portal</code> &rarr; tabela <code>app</code>.
+    Uma linha nova aparece aqui na hora, sem republicar a página.<br>
+    <strong>Ainda sem cartão:</strong> o painel de vendas, o Gestão Click, os sites, e o controle de contas a pagar,
+    que foi construído mas nunca publicado.
+  </footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // Chave PUBLICÁVEL do projeto Tratativas. Pública por desenho: toda a
+  // proteção está na RLS do schema portal, não no sigilo desta linha.
+  var CHAVE_ANON = 'sb_publishable_CvYFMhsKzU2UsBFFFw-1LQ_TZ-5VhTs';
+
+  var SUPABASE_URL = 'https://fhmzhqxwxbvxrqjeqnya.supabase.co';
+  var GUARDA = 'portal.agromania.sessao';
+
+  var telaEntrada    = document.getElementById('telaEntrada');
+  var telaCarregando = document.getElementById('telaCarregando');
+  var telaPortal     = document.getElementById('telaPortal');
+  var formLogin      = document.getElementById('formLogin');
+  var caixaErro      = document.getElementById('erro');
+  var btEntrar       = document.getElementById('btEntrar');
+
+  function ver(qual){
+    telaEntrada.hidden    = (qual !== 'entrada');
+    telaCarregando.hidden = (qual !== 'carregando');
+    telaPortal.hidden     = (qual !== 'portal');
+  }
+
+  function erro(texto){
+    caixaErro.textContent = texto;
+    caixaErro.hidden = false;
+    ver('entrada');
+  }
+
+  // O navegador pode recusar localStorage (janela privada, cookies bloqueados).
+  // Sem ele o portal funciona igual, só pede o login a cada visita.
+  function guardar(s){
+    try { window.localStorage.setItem(GUARDA, JSON.stringify(s)); } catch (e) {}
+  }
+  function lerGuardado(){
+    try { return JSON.parse(window.localStorage.getItem(GUARDA) || 'null'); }
+    catch (e) { return null; }
+  }
+  function esquecer(){
+    try { window.localStorage.removeItem(GUARDA); } catch (e) {}
+  }
+
+  function escapar(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // Só deixa passar endereço http(s). Defesa contra um 'javascript:' que
+  // alguém pusesse na coluna url da tabela.
+  function urlSegura(u){
+    var t = String(u == null ? '' : u).trim();
+    return /^https?:\/\//i.test(t) ? t : '';
+  }
+
+  // --------------------------------------------------------------- rede ---
+  function pedirToken(corpo, tipo){
+    return fetch(SUPABASE_URL + '/auth/v1/token?grant_type=' + tipo, {
+      method: 'POST',
+      headers: { 'apikey': CHAVE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify(corpo)
+    }).then(function(r){
+      return r.json().then(function(j){ return { ok: r.ok, corpo: j }; });
+    });
+  }
+
+  function buscarApps(token){
+    var campos = 'bloco,bloco_ordem,bloco_legenda,nome,descricao,url,pede_senha_n8n,aviso,ordem';
+    var url = SUPABASE_URL + '/rest/v1/app'
+            + '?select=' + campos
+            + '&ativo=eq.true'
+            + '&order=bloco_ordem.asc,ordem.asc';
+    return fetch(url, {
+      headers: {
+        'apikey': CHAVE_ANON,
+        'Authorization': 'Bearer ' + token,
+        'Accept-Profile': 'portal'
+      }
+    }).then(function(r){
+      if (r.status === 401 || r.status === 403) return { expirou: true };
+      return r.json().then(function(j){
+        if (!r.ok) throw new Error(j && j.message ? j.message : ('Supabase respondeu ' + r.status));
+        return { lista: j };
+      });
+    });
+  }
+
+  // -------------------------------------------------------------- tela ---
+  function desenhar(lista){
+    if (!lista || !lista.length){
+      document.getElementById('blocos').innerHTML =
+        '<p class="legenda">Você entrou, mas nenhum cartão apareceu. '
+        + 'Isso quer dizer que seu e-mail não está em <code>portal.usuario_permitido</code>, '
+        + 'ou que o schema <code>portal</code> ainda não foi exposto na API.</p>';
+      return;
+    }
+
+    var html = '', blocoAtual = null;
+    for (var i = 0; i < lista.length; i++){
+      var it = lista[i];
+      if (it.bloco !== blocoAtual){
+        if (blocoAtual !== null) html += '</div></section>';
+        blocoAtual = it.bloco;
+        html += '<section><h2>' + escapar(it.bloco) + '</h2>';
+        if (it.bloco_legenda) html += '<p class="legenda">' + escapar(it.bloco_legenda) + '</p>';
+        html += '<div class="grade">';
+      }
+      var destino = urlSegura(it.url);
+      if (!destino) continue;
+      html += '<a class="cartao" href="' + escapar(destino) + '" target="_blank" rel="noopener noreferrer">';
+      html += '<div class="nome">' + escapar(it.nome) + '</div>';
+      if (it.descricao) html += '<div class="desc">' + escapar(it.descricao) + '</div>';
+      if (it.aviso) html += '<span class="selo alerta">' + escapar(it.aviso) + '</span>';
+      if (it.pede_senha_n8n) html += '<span class="selo">pede a senha do n8n</span>';
+      html += '</a>';
+    }
+    if (blocoAtual !== null) html += '</div></section>';
+    document.getElementById('blocos').innerHTML = html;
+  }
+
+  function abrir(sessao){
+    ver('carregando');
+    buscarApps(sessao.access_token).then(function(r){
+      if (r.expirou) return renovar(sessao);
+      document.getElementById('usuario').textContent = sessao.email || '';
+      desenhar(r.lista);
+      ver('portal');
+    }).catch(function(e){
+      erro('Entrei, mas não consegui ler a lista: ' + (e && e.message ? e.message : e));
+    });
+  }
+
+  function renovar(sessao){
+    if (!sessao || !sessao.refresh_token){ esquecer(); ver('entrada'); return; }
+    pedirToken({ refresh_token: sessao.refresh_token }, 'refresh_token').then(function(r){
+      if (!r.ok || !r.corpo.access_token){ esquecer(); ver('entrada'); return; }
+      var nova = {
+        access_token: r.corpo.access_token,
+        refresh_token: r.corpo.refresh_token,
+        email: (r.corpo.user && r.corpo.user.email) || sessao.email
+      };
+      guardar(nova);
+      abrir(nova);
+    }).catch(function(){ esquecer(); ver('entrada'); });
+  }
+
+  // ------------------------------------------------------------ eventos ---
+  formLogin.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    caixaErro.hidden = true;
+    btEntrar.disabled = true;
+    btEntrar.textContent = 'Entrando…';
+
+    pedirToken({
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('senha').value
+    }, 'password').then(function(r){
+      btEntrar.disabled = false;
+      btEntrar.textContent = 'Entrar';
+      if (!r.ok || !r.corpo.access_token){
+        var m = (r.corpo && (r.corpo.error_description || r.corpo.msg || r.corpo.message)) || '';
+        erro(/invalid/i.test(m) ? 'E-mail ou senha não conferem.' : (m || 'Não consegui entrar.'));
+        return;
+      }
+      document.getElementById('senha').value = '';
+      var sessao = {
+        access_token: r.corpo.access_token,
+        refresh_token: r.corpo.refresh_token,
+        email: (r.corpo.user && r.corpo.user.email) || document.getElementById('email').value.trim()
+      };
+      guardar(sessao);
+      abrir(sessao);
+    }).catch(function(e){
+      btEntrar.disabled = false;
+      btEntrar.textContent = 'Entrar';
+      erro('Não consegui falar com o Supabase: ' + (e && e.message ? e.message : e));
+    });
+  });
+
+  document.getElementById('btSair').addEventListener('click', function(){
+    esquecer();
+    document.getElementById('blocos').innerHTML = '';
+    ver('entrada');
+  });
+
+  // Sessão de uma visita anterior: entra direto.
+  var guardada = lerGuardado();
+  if (guardada && guardada.access_token) abrir(guardada);
+  else ver('entrada');
+
+})();
+</script>
+</body>
+</html>
